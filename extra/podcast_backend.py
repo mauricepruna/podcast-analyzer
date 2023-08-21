@@ -1,4 +1,3 @@
-
 import modal
 
 
@@ -144,17 +143,23 @@ def get_podcast_guest(podcast_transcript):
         ],
         function_call={"name": "get_podcast_guest_information"},
     )
-    
+
     response_message = completion["choices"][0]["message"]
     if response_message.get("function_call"):
         function_name = response_message["function_call"]["name"]
         function_args = json.loads(response_message["function_call"]["arguments"])
-        podcast_guest = function_args.get("guest_name")
+        podcast_guest_name = function_args.get("guest_name")
+        podcastGuest = {}
+        podcastGuest["name"] = podcast_guest_name
+
     try:
-        podcastGuest = wikipedia.page(podcast_guest, auto_suggest=False).summary
+        podcast_guest_summary = wikipedia.page(
+            podcast_guest_name, auto_suggest=False
+        ).summary
     except Exception as e:
-        for i in search(podcast_guest, num_results=1, advanced=True):
-            podcastGuest = i.description
+        for i in search(podcast_guest_name, num_results=1, advanced=True):
+            podcast_guest_summary = i.description
+    podcastGuest["summary"] = podcast_guest_summary
     return podcastGuest
 
 
